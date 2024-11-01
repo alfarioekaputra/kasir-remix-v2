@@ -1,13 +1,16 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ActionFunctionArgs, json, LoaderFunctionArgs, redirect } from "@remix-run/node"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import Api from "~/api"
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    sessionStorage
-} from "~/services/session.server";
+  ActionFunctionArgs,
+  json,
+  LoaderFunctionArgs,
+  redirect,
+} from '@remix-run/node';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import Api from '~/api';
+import { sessionStorage } from '~/services/session.server';
 
-import { Button } from "~/components/ui/button"
+import { Button } from '~/components/ui/button';
 import {
   Form,
   FormControl,
@@ -16,61 +19,92 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
+} from '~/components/ui/form';
+import { Input } from '~/components/ui/input';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
 
 const formSchema = z.object({
   identity: z.string().min(2).max(50),
   password: z.string().min(2).max(50),
-})
+});
 
 export default function Login() {
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            identity: "",
-            password: "",
-        },
-    })
-    return (
-        <>
-            <div className="flex items-center justify-center bg-cover bg-center h-screen">
-                <div className="bg-white p-8 rounded-lg shadow-lg w-1/3">
-                    <Form {...form}>
-                    <form method="post" className="space-y-8">
-                        <FormField
-                        control={form.control}
-                        name="identity"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Input Username" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Input Password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <Button type="submit">Login</Button>
-                    </form>
-                    </Form>
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      identity: '',
+      password: '',
+    },
+  });
+  return (
+    <>
+      <div className="flex h-screen w-full items-center justify-center px-4">
+        <Card className="mx-auto max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-2xl">Login</CardTitle>
+            <CardDescription>
+              Enter your email below to login to your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form method="post" className="space-y-8">
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <FormField
+                      control={form.control}
+                      name="identity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input Username"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-            </div>
-        </>
-    )
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input Password"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full">
+                  Login
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  );
 }
 
 // Second, we need to export an action function, here we will use the
@@ -83,10 +117,12 @@ export async function action({ request }: ActionFunctionArgs) {
   //   successRedirect: "/dashboard",
   //   failureRedirect: "/login",
   // });
-  const session = await sessionStorage.getSession(request.headers.get("Cookie"));
+  const session = await sessionStorage.getSession(
+    request.headers.get('Cookie')
+  );
   const body = await request.formData();
-  const identity = body.get("identity");
-  const password = body.get("password");
+  const identity = body.get('identity');
+  const password = body.get('password');
   console.log(identity);
   const payload = {
     identity,
@@ -106,15 +142,15 @@ export async function action({ request }: ActionFunctionArgs) {
       },
     };
 
-    session.set("credentials", sessionPayload);
-    return redirect("/admin/dashboard", {
+    session.set('credentials', sessionPayload);
+    return redirect('/admin/dashboard', {
       headers: {
-        "Set-Cookie": await sessionStorage.commitSession(session),
+        'Set-Cookie': await sessionStorage.commitSession(session),
       },
     });
   } catch (error: any) {
     console.log(error);
-    return json("error.response");
+    return json('error.response');
   }
 }
 
@@ -127,13 +163,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   //   successRedirect: "/dashboard",
   // });
   // get the session
-  const cookie = request.headers.get("cookie");
+  const cookie = request.headers.get('cookie');
   const session = await sessionStorage.getSession(cookie);
 
   // if the user is logged in, redirect them to the dashboard
-  if (session.has("credentials")) {
-    return redirect("/admin/dashboard");
+  if (session.has('credentials')) {
+    return redirect('/admin/dashboard');
   } else {
-    return json({ message: "Please login" });
+    return json({ message: 'Please login' });
   }
 }

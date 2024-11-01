@@ -1,5 +1,5 @@
-import axios from "axios";
-import { getSession } from "~/services/session.server";
+import axios from 'axios';
+import { sessionStorage } from '~/services/session.server';
 
 export type LoginPayload = {
   identity: FormDataEntryValue | null;
@@ -11,7 +11,7 @@ const Api = class Api {
   token: string | undefined;
   constructor() {
     this.baseURL = process.env.API_BASE_URL as string;
-    this.token = "";
+    this.token = '';
   }
 
   initializeInstance = () => {
@@ -47,13 +47,15 @@ const Api = class Api {
   };
 
   loginUser = (payload: LoginPayload) => {
-    const url = "/users/auth-with-password";
-    return this.publicRequest(url, "POST", payload);
+    const url = '/users/auth-with-password';
+    return this.publicRequest(url, 'POST', payload);
   };
 
   async setToken(request: Request) {
-    const session = await getSession(request.headers.get("Cookie"));
-    const token = session.get("credentials")?.token;
+    const session = await sessionStorage.getSession(
+      request.headers.get('Cookie')
+    );
+    const token = session.get('credentials')?.token;
     this.token = token;
   }
   authClient = (url: string, method: string, data: any) => {
@@ -79,8 +81,8 @@ const Api = class Api {
     });
   };
   getSuppliers = () => {
-    const url = "/supplier/records";
-    return this.authClient(url, "get", {});
+    const url = '/supplier/records';
+    return this.authClient(url, 'get', {});
   };
 };
 

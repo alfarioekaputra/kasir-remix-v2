@@ -1,5 +1,10 @@
 // app/services/session.server.ts
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import {
+  createCookieSessionStorage,
+  redirect,
+  SessionStorage,
+} from "@remix-run/node";
+import { createThemeSessionResolver } from "remix-themes";
 
 type SessionData = {
   credentials: {
@@ -48,3 +53,7 @@ export async function requireUserSession(request: Request) {
 
   return session;
 }
+
+export const themeSessionResolver = createThemeSessionResolver(
+  sessionStorage as SessionStorage
+);

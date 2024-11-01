@@ -1,13 +1,21 @@
-import {
-    sessionStorage,
-    requireUserSession
-} from "~/services/session.server";
+import { sessionStorage, requireUserSession } from "~/services/session.server";
 
 import { useState } from "react";
-import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  redirect,
+} from "@remix-run/node";
+import { ModeToggle } from "~/components/mode-toggle";
+
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
+import { AppSidebar } from "~/components/app-sidebar";
+import { Separator } from "~/components/ui/separator";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "~/components/ui/breadcrumb";
+import { Outlet } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    return await requireUserSession(request);
+  return await requireUserSession(request);
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -23,7 +31,12 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Admin() {
-    return (
-        <h1>Admin</h1>
-    )
+  return (
+    <>
+        <SidebarProvider>
+            <AppSidebar />
+            <Outlet />
+        </SidebarProvider>
+    </>
+  );
 }
